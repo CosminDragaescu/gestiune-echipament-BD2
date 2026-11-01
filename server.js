@@ -4,48 +4,39 @@ const { Pool } = require('pg');
 const fs = require('fs');
 
 const app = express();
-app.set('view engine', 'ejs'); 
-
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
+async function pornesteBazaDeDate() {
+    try {
+        const schemaSql = fs.readFileSync('./init.sql', 'utf8');
+        await pool.query(schemaSql);
+        console.log('1. Cele 7 tabele sunt create si verificate in Neon DB.');
 
-async function verificaBazaDeDate() {
-    const rezultat = await pool.query('SELECT COUNT(*) FROM roluri');
-    if ( parseInt(rezultat.rows[0].count) === 0 ) {
-        console.log('Baza este goala. Introducem datele de test (Fixtures)...');
-        const sqlFixtures = fs.readFileSync('./fixtures.sql', 'utf8');
-        await pool.query(sqlFixtures);
-        console.log('Datele de test au fost introduse!');
-    } else {
-        console.log('Conexiune reusita la Neon DB! Datele exista deja.');
+        const rezultat = await pool.query('SELECT COUNT(*) FROM roluri');
+        if (parseInt(rezultat.rows[0].count) === 0) {
+            console.log('2. Baza de date este goala. Se introduc datele de test (Fixtures)...');
+            const fixturesSql = fs.readFileSync('./fixtures.sql', 'utf8');
+            await pool.query(fixturesSql);
+            console.log('-> Fixtures au fost introduse cu succes!');
+        } else {
+            console.log('2. Datele de test (Fixtures) exista deja in baza de date.');
+        }
+
+        const jucatori = await pool.query('SELECT COUNT(*) FROM jucatori');
+        const echipamente = await pool.query('SELECT COUNT(*) FROM echipamente');
+        const alocari = await pool.query('SELECT COUNT(*) FROM alocari_echipament');
+        console.log(`3. Stare baza de date: ${jucatori.rows[0].count} jucatori, ${echipamente.rows[0].count} echipamente, ${alocari.rows[0].count} alocari.`);
+
+    } catch (eroare) {
+        console.error('Eroare la baza de date:', eroare.message);
     }
 }
 
-
-app.get('/', async (req, res) => { 
-    const jucatori = await pool.query('SELECT * FROM jucatori ORDER BY numar_tricou');
-    const echipamente = await pool.query('SELECT * FROM echipamente');
-    const alocari = await pool.query(`
-        SELECT a.id, j.nume, j.prenume, e.denumire, a.cantitate, a.data_alocarii, a.stare_returnare 
-        FROM alocari_echipament a
-        JOIN jucatori j ON a.jucator_id = j.id
-        JOIN echipamente e ON a.echipament_id = e.id
-    `);
-
-   
-    res.render('index', {
-        listaJucatori: jucatori.rows,
-        listaEchipamente: echipamente.rows,
-        listaAlocari: alocari.rows
-    });
-});
-
-
 app.listen(3000, async () => {
-    await verificaBazaDeDate();
-    console.log('Site-ul a pornit pe http://localhost:3000');
+    console.log('Serviciul a pornit...');
+    await pornesteBazaDeDate();
 });
