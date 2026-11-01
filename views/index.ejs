@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestiune Echipament Fotbal</title>
+    <!-- Folosim Bootstrap doar ca sa arate tabelele curat, fara sa scriem noi CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light p-4">
+    <div class="container">
+        <h2 class="mb-4">Sistem de gestiune a echipamentului unei echipe de fotbal</h2>
+
+        <!-- Tabel 1: Jucatori -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">Lotul de Jucători</div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nr. Tricou</th>
+                            <th>Nume și Prenume</th>
+                            <th>Poziție</th>
+                            <th>Mărime Tricou</th>
+                            <th>Mărime Ghete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% listaJucatori.forEach(function(j) { %>
+                            <tr>
+                                <td><strong>#<%= j.numar_tricou %></strong></td>
+                                <td><%= j.nume %> <%= j.prenume %></td>
+                                <td><%= j.pozitie %></td>
+                                <td><%= j.marime_tricou %></td>
+                                <td><%= j.marime_ghete %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabel 2: Stoc Echipamente -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">Stoc Magazie (Echipamente)</div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Denumire Articol</th>
+                            <th>Mărime</th>
+                            <th>Stoc Total</th>
+                            <th>Stoc Disponibil</th>
+                            <th>Preț Unitar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% listaEchipamente.forEach(function(e) { %>
+                            <tr>
+                                <td><%= e.denumire %></td>
+                                <td><%= e.marime %></td>
+                                <td><%= e.stoc_total %> buc</td>
+                                <td><strong><%= e.stoc_disponibil %> buc</strong></td>
+                                <td><%= e.pret_unitar %> RON</td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tabel 3: Alocari -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">Fișa de Alocări Echipament</div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Jucător</th>
+                            <th>Echipament Alocat</th>
+                            <th>Cantitate</th>
+                            <th>Data Alocării</th>
+                            <th>Stare Returnare</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% listaAlocari.forEach(function(a) { %>
+                            <tr>
+                                <td><%= a.nume %> <%= a.prenume %></td>
+                                <td><%= a.denumire %></td>
+                                <td><%= a.cantitate %></td>
+                                <td><%= new Date(a.data_alocarii).toLocaleDateString('ro-RO') %></td>
+                                <td><%= a.stare_returnare ? a.stare_returnare : 'În folosință (nereturnat)' %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
